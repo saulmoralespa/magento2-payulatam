@@ -1,0 +1,22 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * @copyright Copyright (c) 2019 Saul Morales Paccheco www.saulmoralespa.com
+ */
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Store:etc/config.xsd">
+    <default>
+        <payment>
+            <payulatam>
+                <active>0</active>
+                <title>payU latam</title>
+                <environment>0</environment>
+                <order_status>pending_payment</order_status>
+                <model>Saulmoralespa\PayuLatam\Model\PayuLatam</model>
+                <payment_action>true</payment_action>
+                <allowspecific>0</allowspecific>
+                <group>offline</group>
+            </payulatam>
+        </payment>
+    </default>
+</config>

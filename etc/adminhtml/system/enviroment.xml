@@ -1,0 +1,58 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Copyright  2015 Magento. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+-->
+<include xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_include.xsd">
+    <group id="enviroment_g" translate="label" type="text" sortOrder="8" showInDefault="1" showInWebsite="1" showInStore="1">
+        <label>Enviroments</label>
+        <group id="development" translate="label" type="text" sortOrder="100" showInDefault="1" showInWebsite="1" showInStore="1">
+            <label>Development</label>
+            <field id="merchantId" translate="label" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
+                <label>MerchantId</label>
+                <comment>
+                    <![CDATA[Copy the <a href="http://developers.payulatam.com/es/web_checkout/sandbox.html" target="_blank">test credentials</a>]]>
+                </comment>
+            </field>
+            <field id="accountId" translate="label" type="text" sortOrder="11" showInDefault="1" showInWebsite="1" showInStore="1">
+                <label>accountId</label>
+                <comment>
+                    <![CDATA[Copy the <a href="http://developers.payulatam.com/es/web_checkout/sandbox.html" target="_blank">test credentials</a>]]>
+                </comment>
+            </field>
+            <field id="apiKey" translate="label" type="text" sortOrder="11" showInDefault="1" showInWebsite="1" showInStore="1">
+                <label>apiKey</label>
+                <comment>
+                    <![CDATA[Copy the <a href="http://developers.payulatam.com/es/web_checkout/sandbox.html" target="_blank">test credentials</a>]]>
+                </comment>
+            </field>
+            <field id="apiLogin" translate="label" type="text" sortOrder="11" showInDefault="1" showInWebsite="1" showInStore="1">
+                <label>apiLogin</label>
+                <comment>
+                    <![CDATA[Copy the <a href="http://developers.payulatam.com/es/web_checkout/sandbox.html" target="_blank">test credentials</a>]]>
+                </comment>
+            </field>
+        </group>
+        <group id="production" translate="label" type="text" sortOrder="200" showInDefault="1" showInWebsite="1" showInStore="1">
+            <label>Production</label>
+            <field id="merchantId" translate="label" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
+                <label>MerchantId</label>
+                <comment>Copy from your configuration in PayuLatam panel</comment>
+            </field>
+            <field id="accountId" translate="label" type="text" sortOrder="11" showInDefault="1" showInWebsite="1" showInStore="1">
+                <label>accountId</label>
+                <comment>Copy from your configuration in PayuLatam panel</comment>
+            </field>
+            <field id="apiKey" translate="label" type="text" sortOrder="11" showInDefault="1" showInWebsite="1" showInStore="1">
+                <label>apiKey</label>
+                <comment>Copy from your configuration in PayuLatam panel</comment>
+            </field>
+            <field id="apiLogin" translate="label" type="text" sortOrder="11" showInDefault="1" showInWebsite="1" showInStore="1">
+                <label>apiLogin</label>
+                <comment>Copy from your configuration in PayuLatam panel</comment>
+            </field>
+        </group>
+    </group>
+</include>
