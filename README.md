@@ -30,4 +30,4 @@ php bin/magento setup:static-content:deploy en_US #on i18n
 ## Configuration ##
 
 ### 1. Enter the configuration menu of the payment method ###
-![Enter the configuration menu of the payment method](https://4.bp.blogspot.com/-vPfP40YDaPE/XCZpZS32NaI/AAAAAAAACnA/DGA4AibYG6ETZxmv5gwm4bq3fXszxE_0ACLcBGAs/s1600/configurationmenuofthepaymentmethod.png)
+![Enter the configuration menu of the payment method](https://3.bp.blogspot.com/-5m36ATRGME4/XFI7sK7D-UI/AAAAAAAACpc/NZ0OIW6LITcWkk2Kte8y4i5BbDWLvykfgCLcBGAs/s1600/payu-latam-magento2.png)
