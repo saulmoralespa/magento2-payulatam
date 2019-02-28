@@ -54,8 +54,6 @@ class Notify  extends \Magento\Framework\App\Action\Action
         if (empty($params))
             exit;
 
-        $this->_payuLatamLogger->debug('notify params: ' . print_r($params), true());
-
         $order_id = $request->getParam('extra1');
 
         $objectManager = \Magento\Framework\App\ObjectManager::getInstance();

@@ -15,7 +15,11 @@ class Data extends \Magento\Framework\App\Action\Action
 {
     protected $_helperData;
 
+    protected $_payuLatamLogger;
+
     protected $_checkoutSession;
+
+    protected $_orderFactory;
 
     protected $_resultJsonFactory;
 
@@ -28,7 +32,9 @@ class Data extends \Magento\Framework\App\Action\Action
     public function __construct(
         \Magento\Framework\App\Action\Context $context,
         \Magento\Checkout\Model\Session $checkoutSession,
+        \Magento\Sales\Model\OrderFactory $orderFactory,
         \Saulmoralespa\PayuLatam\Helper\Data $helperData,
+        \Saulmoralespa\PayuLatam\Logger\Logger $payuLatamLogger,
         \Magento\Framework\Controller\Result\JsonFactory $resultJsonFactory,
         \Magento\Sales\Model\Order\Payment\Transaction\BuilderInterface $transactionBuilder,
         PaymentHelper $paymentHelper
@@ -37,22 +43,18 @@ class Data extends \Magento\Framework\App\Action\Action
         parent::__construct($context);
 
         $this->_checkoutSession = $checkoutSession;
+        $this->_orderFactory = $orderFactory;
         $this->_helperData = $helperData;
+        $this->_payuLatamLogger = $payuLatamLogger;
         $this->_resultJsonFactory = $resultJsonFactory;
         $this->_url = $context->getUrl();
         $this->_transactionBuilder = $transactionBuilder;
         $this->_paymentHelper = $paymentHelper;
     }
 
-    protected function _getCheckoutSession()
-    {
-        return $this->_checkoutSession;
-    }
-
     public function execute()
     {
-
-        $order = $this->_getCheckoutSession()->getLastRealOrder();
+        $order = $this->_orderFactory->create()->loadByIncrementId($this->_checkoutSession->getLastRealOrderId());
 
         $referenceCode  = time();
 
@@ -82,20 +84,33 @@ class Data extends \Magento\Framework\App\Action\Action
     }
 
 
+    public function getAddress($order)
+    {
+        $billingAddress = $order->getBillingAddress();
+        $shippingAddress = $order->getShippingAddress();
+
+        if ($billingAddress){
+            return $billingAddress;
+        }
+
+        return $shippingAddress;
+
+    }
+
     public function getDataParamsPayment($order, $referenceCode)
     {
         $incrementId = $order->getIncrementId();
-        $billingAddress = $order->getBillingAddress();
-        $shippingAddress = $order->getShippingAddress();
+
+        $address = $this->getAddress($order);
 
 
         $method = $order->getPayment()->getMethod();
         $methodInstance = $this->_paymentHelper->getMethodInstance($method);
 
-        $addresLine1 = empty($shippingAddress->getStreetLine(1)) ? $billingAddress->getStreet() : $shippingAddress->getStreetLine(1);
-        $city = empty($shippingAddress->getCity()) ? $billingAddress->getCity() : $shippingAddress->getCity();
-        $country = empty($shippingAddress->getCountryId())  ? $billingAddress->getCountryId() : $shippingAddress->getCountryId();
-        $phone = empty($shippingAddress->getTelephone())  ? $billingAddress->getTelephone() : $shippingAddress->getTelephone();
+        $addresLine1 = $address->getData("street");
+        $city = $address->getCity();
+        $country = $address->getCountryId();
+        $phone = $address->getTelephone();
         $currencyCode = $order->getOrderCurrencyCode();
         $amount = $methodInstance->getAmount($order);
 
@@ -116,7 +131,7 @@ class Data extends \Magento\Framework\App\Action\Action
                 'amount' => $amount,
                 'description' => __('Order # %1', [$incrementId]) . " ",
                 'extra1' => $incrementId,
-                'buyerFullName' => $billingAddress->getFirstname(). ' '.$billingAddress->getLastname(),
+                'buyerFullName' => $address->getFirstname(). ' ' . $address->getLastname(),
                 'buyerEmail' => $order->getCustomerEmail(),
                 'telephone' => $phone,
                 'shippingAddress' => $addresLine1,
