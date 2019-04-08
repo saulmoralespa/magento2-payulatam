@@ -144,7 +144,7 @@ class Complete extends \Magento\Framework\App\Action\Action
 
         $pathRedirect = "checkout/onepage/success";
 
-        if ($order->getState() === $pendingOrder && $statusTransaction === '7'){;
+        if ($order->getState() === $pendingOrder && $statusTransaction === '7'){
             $pathRedirect = "payulatam/payment/pending";
         }elseif ($order->getState() === $pendingOrder && $statusTransaction !== '7'  && $statusTransaction !== '4' ){
             $payment->setIsTransactionClosed(1);
@@ -164,16 +164,15 @@ class Complete extends \Magento\Framework\App\Action\Action
             $payment->setIsTransactionClosed(1);
             $payment->setIsTransactionPending(false);
             $payment->setIsTransactionApproved(true);
+            $payment->setSkipOrderProcessing(false);
 
             $status = $statuses["approved"];
-            $state = $aprovvedOrder;
 
-            $order->setState($state)->setStatus($status);
-            $payment->setSkipOrderProcessing(true);
+            $order->setState($aprovvedOrder)->setStatus($status);
 
             $invoice = $objectManager->create('Magento\Sales\Model\Service\InvoiceService')->prepareInvoice($order);
             $invoice = $invoice->setTransactionId($transactionId)
-                ->addComment("Invoice created.")
+                ->addComment(__("Invoice created"))
                 ->setRequestedCaptureCase(\Magento\Sales\Model\Order\Invoice::CAPTURE_ONLINE);
             $invoice->register()
                 ->pay();
@@ -186,11 +185,11 @@ class Complete extends \Magento\Framework\App\Action\Action
             $transactionInvoice->save();
 
             $order->addStatusHistoryComment(
-                __('Invoice #%1.', $invoice->getId())
+                __('Invoice #%1', $invoice->getId())
             )
                 ->setIsCustomerNotified(true);
 
-            $message = $request->getParam('message') . " transaction_id: $transactionId" ;
+            $message = __("transaction ID:%1", $transactionId);
             $payment->addTransactionCommentsToOrder($transaction, $message);
             //$transaction->save();
             $order->save();
