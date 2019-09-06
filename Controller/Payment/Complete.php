@@ -11,6 +11,7 @@ namespace Saulmoralespa\PayuLatam\Controller\Payment;
 use Magento\Framework\Controller\ResultFactory;
 use Magento\Payment\Helper\Data as PaymentHelper;
 use Magento\Sales\Model\Order\Payment\Transaction;
+use Magento\Store\Model\StoreManagerInterface;
 
 class Complete extends \Magento\Framework\App\Action\Action
 {
@@ -91,7 +92,7 @@ class Complete extends \Magento\Framework\App\Action\Action
         $params = $request->getParams();
 
         if (empty($params))
-            exit;
+            return;
 
 
         $order_id = $request->getParam('extra1');

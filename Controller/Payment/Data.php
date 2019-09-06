@@ -66,16 +66,16 @@ class Data extends \Magento\Framework\App\Action\Action
         $payment->setIsTransactionPending(true);
         $transaction = $this->_transactionBuilder->setPayment($payment)
             ->setOrder($order)
+            ->setTransactionId($payment->getTransactionId())
             ->build(Transaction::TYPE_ORDER);
 
-        $payment->addTransactionCommentsToOrder($transaction, __('pending'));
+        $payment->addTransactionCommentsToOrder($transaction, __('Pending payment'));
         $statuses = $this->_helperData->getOrderStates();
         $status = $statuses["pending"];
         $state = \Magento\Sales\Model\Order::STATE_PENDING_PAYMENT;
         $order->setState($state)->setStatus($status);
         $payment->setSkipOrderProcessing(true);
         $order->save();
-
 
         $result = $this->_resultJsonFactory->create();
         return $result->setData([
@@ -129,7 +129,7 @@ class Data extends \Magento\Framework\App\Action\Action
                 'merchantId' => $this->_helperData->getMerchantId(),
                 'accountId' => $this->_helperData->getAccountId(),
                 'amount' => $amount,
-                'description' => __('Order # %1', [$incrementId]) . " ",
+                'description' => __('Order # %1', $incrementId),
                 'extra1' => $incrementId,
                 'buyerFullName' => $address->getFirstname(). ' ' . $address->getLastname(),
                 'buyerEmail' => $order->getCustomerEmail(),

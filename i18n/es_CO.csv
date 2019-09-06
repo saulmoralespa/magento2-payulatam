@@ -1,6 +1,13 @@
-"Copy the <a href="http://developers.payulatam.com/es/web_checkout/sandbox.html" target="_blank">test credentials</a>","Copia las <a href="http://developers.payulatam.com/es/web_checkout/sandbox.html" target="_blank">credenciales de prueba</a>",
-"Copy from your configuration in PayuLatam panel","Copia desde tu configuración en el panel de PayuLatam.",
+"Copy the <a href="http://developers.payulatam.com/es/web_checkout/sandbox.html" target="_blank">test credentials</a>","Copia las <a href="http://developers.payulatam.com/es/web_checkout/sandbox.html" target="_blan  k">credenciales de prueba</a>",
+"Copy from your configuration in PayuLatam panel","Copia desde tu configuración en el panel de PayuLatam",
+"Production","Producción",
+"State of the Order","Estado de la Orden",
+"Initial state of the order","Estado inicial del pedido",
+"Order status when the payment is approved","Estado del pedido cuando el pago es aprobado",
+"Order status when the payment is rejected","Estado del pedido cuando el pago es rechazado",
 "The status of the order is pending, waiting to process the payment by  payU latam","El estado del pedido está pendiente, en espera de procesar el pago por payU latam",
 "Invoice created","Factura creada",
+"Order # %1","Pedido # %1"
 "Invoice #%1","Factura #%1",
-"transaction ID:%1","ID de transacción:%1"
+"transaction ID:%1","ID de transacción:%1",
+"Pending payment","Pago pendiente"

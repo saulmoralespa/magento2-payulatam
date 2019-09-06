@@ -8,7 +8,7 @@
     <system>
         <section id="payment">
             <group id="payulatam" translate="label" type="text" sortOrder="60" showInDefault="1" showInWebsite="1" showInStore="1">
-                <label>payU latam version 1.0.0</label>
+                <label>payU latam</label>
 
                 <field id="active" translate="label" type="select" sortOrder="1" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Enabled</label>

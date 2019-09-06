@@ -13,25 +13,35 @@
             <field id="merchantId" translate="label" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
                 <label>MerchantId</label>
                 <comment>
-                    <![CDATA[Copy the <a href="http://developers.payulatam.com/es/web_checkout/sandbox.html" target="_blank">test credentials</a>]]>
+                    <![CDATA[
+                    Copy the <a href="http://developers.payulatam.com/es/web_checkout/sandbox.html" target="_blank">test credentials</a>
+                    ]]>
                 </comment>
+                <validate>validate-number</validate>
             </field>
             <field id="accountId" translate="label" type="text" sortOrder="11" showInDefault="1" showInWebsite="1" showInStore="1">
                 <label>accountId</label>
                 <comment>
-                    <![CDATA[Copy the <a href="http://developers.payulatam.com/es/web_checkout/sandbox.html" target="_blank">test credentials</a>]]>
+                    <![CDATA[
+                    Copy the <a href="http://developers.payulatam.com/es/web_checkout/sandbox.html" target="_blank">test credentials</a>
+                    ]]>
                 </comment>
+                <validate>validate-number</validate>
             </field>
             <field id="apiKey" translate="label" type="text" sortOrder="11" showInDefault="1" showInWebsite="1" showInStore="1">
                 <label>apiKey</label>
                 <comment>
-                    <![CDATA[Copy the <a href="http://developers.payulatam.com/es/web_checkout/sandbox.html" target="_blank">test credentials</a>]]>
+                    <![CDATA[
+                    Copy the <a href="http://developers.payulatam.com/es/web_checkout/sandbox.html" target="_blank">test credentials</a>
+                    ]]>
                 </comment>
             </field>
             <field id="apiLogin" translate="label" type="text" sortOrder="11" showInDefault="1" showInWebsite="1" showInStore="1">
                 <label>apiLogin</label>
                 <comment>
-                    <![CDATA[Copy the <a href="http://developers.payulatam.com/es/web_checkout/sandbox.html" target="_blank">test credentials</a>]]>
+                    <![CDATA[
+                    Copy the <a href="http://developers.payulatam.com/es/web_checkout/sandbox.html" target="_blank">test credentials</a>
+                    ]]>
                 </comment>
             </field>
         </group>
@@ -40,10 +50,12 @@
             <field id="merchantId" translate="label" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
                 <label>MerchantId</label>
                 <comment>Copy from your configuration in PayuLatam panel</comment>
+                <validate>validate-number</validate>
             </field>
             <field id="accountId" translate="label" type="text" sortOrder="11" showInDefault="1" showInWebsite="1" showInStore="1">
                 <label>accountId</label>
                 <comment>Copy from your configuration in PayuLatam panel</comment>
+                <validate>validate-number</validate>
             </field>
             <field id="apiKey" translate="label" type="text" sortOrder="11" showInDefault="1" showInWebsite="1" showInStore="1">
                 <label>apiKey</label>

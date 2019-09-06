@@ -17,33 +17,32 @@ class Notify  extends \Magento\Framework\App\Action\Action
 
     protected $_checkoutSession;
 
-    protected $_resultPageFactory;
-
     protected $_url;
 
     protected $_paymentHelper;
 
     protected $_transactionRepository;
 
-    protected $_payuLatamLogger;
+    protected $request;
+    protected $formKey;
 
     public function __construct(
-        \Saulmoralespa\PayuLatam\Logger\Logger $payuLatamLogger,
         \Magento\Framework\App\Action\Context $context,
-        \Magento\Checkout\Model\Session $checkoutSession,
+        \Magento\Framework\Data\Form\FormKey $formKey,
+        \Magento\Framework\App\Request\Http $request,
         \Saulmoralespa\PayuLatam\Helper\Data $helperData,
         PaymentHelper $paymentHelper,
         \Magento\Sales\Api\TransactionRepositoryInterface $transactionRepository
     )
     {
         parent::__construct($context);
-
-        $this->_checkoutSession = $checkoutSession;
         $this->_helperData = $helperData;
         $this->_paymentHelper = $paymentHelper;
         $this->_url = $context->getUrl();
         $this->_transactionRepository = $transactionRepository;
-        $this->_payuLatamLogger = $payuLatamLogger;
+        $this->request = $request;
+        $this->formKey = $formKey;
+        $this->request->setParam('form_key', $this->formKey->getFormKey());
     }
 
     public function execute()
@@ -52,7 +51,7 @@ class Notify  extends \Magento\Framework\App\Action\Action
         $params = $request->getParams();
 
         if (empty($params))
-            exit;
+            return;
 
         $order_id = $request->getParam('extra1');
 
@@ -83,7 +82,7 @@ class Notify  extends \Magento\Framework\App\Action\Action
 
 
         if ($signatureOrder !== $signaturePayuLatam)
-            exit;
+            return;
 
         $payment = $order->getPayment();
 
@@ -100,7 +99,7 @@ class Notify  extends \Magento\Framework\App\Action\Action
         );
 
         if ($order->getState() === $pendingOrder && $statusTransaction === '7'){
-            exit;
+            return;
         }elseif ($order->getState() === $pendingOrder && $statusTransaction !== '7'  && $statusTransaction !== '4' ){
             $payment->setIsTransactionClosed(1);
             $payment->setIsTransactionPending(false);

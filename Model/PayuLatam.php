@@ -153,5 +153,4 @@ class PayuLatam extends \Magento\Payment\Model\Method\AbstractMethod
         );
     }
 
-
 }
