@@ -24,6 +24,7 @@ class Notify  extends \Magento\Framework\App\Action\Action
     protected $_transactionRepository;
 
     protected $request;
+
     protected $formKey;
 
     public function __construct(

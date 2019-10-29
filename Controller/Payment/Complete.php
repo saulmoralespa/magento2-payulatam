@@ -61,10 +61,21 @@ class Complete extends \Magento\Framework\App\Action\Action
      */
     protected $_url;
 
+    /**
+     * @var \Magento\Framework\App\Request\Http
+     */
+    protected $request;
+    /**
+     * @var \Magento\Framework\Data\Form\FormKey
+     */
+    protected $formKey;
+
     public function __construct(
         \Saulmoralespa\PayuLatam\Logger\Logger $payuLatamLogger,
         \Saulmoralespa\PayuLatam\Helper\Data $helperData,
         \Magento\Framework\App\Action\Context $context,
+        \Magento\Framework\Data\Form\FormKey $formKey,
+        \Magento\Framework\App\Request\Http $request,
         \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig,
         \Magento\Checkout\Model\Session $checkoutSession,
         \Psr\Log\LoggerInterface $logger,
@@ -84,6 +95,9 @@ class Complete extends \Magento\Framework\App\Action\Action
         $this->_transactionBuilder = $transactionBuilder;
         $this->_payuLatamLogger = $payuLatamLogger;
         $this->_url = $context->getUrl();
+        $this->request = $request;
+        $this->formKey = $formKey;
+        $this->request->setParam('form_key', $this->formKey->getFormKey());
     }
 
     public function execute()
