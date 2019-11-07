@@ -99,10 +99,9 @@ class Data extends \Magento\Framework\App\Action\Action
 
     public function getDataParamsPayment($order, $referenceCode)
     {
-        $incrementId = $order->getIncrementId();
+        $order_id = $order->getId();
 
         $address = $this->getAddress($order);
-
 
         $method = $order->getPayment()->getMethod();
         $methodInstance = $this->_paymentHelper->getMethodInstance($method);
@@ -129,8 +128,8 @@ class Data extends \Magento\Framework\App\Action\Action
                 'merchantId' => $this->_helperData->getMerchantId(),
                 'accountId' => $this->_helperData->getAccountId(),
                 'amount' => $amount,
-                'description' => __('Order # %1', $incrementId),
-                'extra1' => $incrementId,
+                'description' => __('Order # %1', $order_id),
+                'extra1' => $order_id,
                 'buyerFullName' => $address->getFirstname(). ' ' . $address->getLastname(),
                 'buyerEmail' => $order->getCustomerEmail(),
                 'telephone' => $phone,

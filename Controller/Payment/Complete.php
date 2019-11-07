@@ -118,7 +118,6 @@ class Complete extends \Magento\Framework\App\Action\Action
         $method = $order->getPayment()->getMethod();
         $methodInstance = $this->_paymentHelper->getMethodInstance($method);
 
-
         $referenceCode = $request->getParam('referenceCode');
         $statusTransaction = $request->getParam('transactionState');
         $signaturePayuLatam = $request->getParam('signature');
