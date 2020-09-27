@@ -132,7 +132,8 @@ class PayuLatam extends \Magento\Payment\Model\Method\AbstractMethod
 
     public function getSignCreate(array $data = [])
     {
-        return md5(
+        return hash(
+            "md5",
             $this->_helperData->getApiKey() . "~" .
             $this->_helperData->getMerchantId() . "~" .
             $data['referenceCode'] ."~".
@@ -143,7 +144,8 @@ class PayuLatam extends \Magento\Payment\Model\Method\AbstractMethod
 
     public function getSignValidate(array $data = [])
     {
-        return md5(
+        return hash(
+            "md5",
             $this->_helperData->getApiKey() . "~" .
             $this->_helperData->getMerchantId() . "~" .
             $data['referenceCode'] . "~" .
