@@ -11,6 +11,9 @@ namespace Saulmoralespa\PayuLatam\Controller\Payment;
 
 class Pending extends \Magento\Framework\App\Action\Action
 {
+    /**
+     * @var \Magento\Framework\View\Result\PageFactory
+     */
     protected $_pageFactory;
 
     public function __construct(

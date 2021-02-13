@@ -8,24 +8,59 @@
 
 namespace Saulmoralespa\PayuLatam\Controller\Payment;
 
+use Magento\Framework\DB\Transaction as DbTransaction;
 use Magento\Payment\Helper\Data as PaymentHelper;
 use Magento\Sales\Model\Order\Payment\Transaction;
+use Magento\Sales\Model\Order;
+use Magento\Sales\Model\Service\InvoiceService;
+use Magento\Sales\Model\OrderRepository;
 
 class Notify  extends \Magento\Framework\App\Action\Action
 {
+    /**
+     * @var \Saulmoralespa\PayuLatam\Helper\Data
+     */
     protected $_helperData;
-
+    /**
+     * @var
+     */
     protected $_checkoutSession;
-
+    /**
+     * @var \Magento\Framework\UrlInterface
+     */
     protected $_url;
-
+    /**
+     * @var PaymentHelper
+     */
     protected $_paymentHelper;
-
+    /**
+     * @var \Magento\Sales\Api\TransactionRepositoryInterface
+     */
     protected $_transactionRepository;
-
+    /**
+     * @var \Magento\Framework\App\Request\Http
+     */
     protected $request;
-
+    /**
+     * @var \Magento\Framework\Data\Form\FormKey
+     */
     protected $formKey;
+    /**
+     * @var Order
+     */
+    protected $_order;
+    /**
+     * @var InvoiceService
+     */
+    protected $_invoiceService;
+    /**
+     * @var DbTransaction
+     */
+    protected $_dbTransaction;
+    /**
+     * @var OrderRepository
+     */
+    protected $_orderRepository;
 
     public function __construct(
         \Magento\Framework\App\Action\Context $context,
@@ -33,7 +68,11 @@ class Notify  extends \Magento\Framework\App\Action\Action
         \Magento\Framework\App\Request\Http $request,
         \Saulmoralespa\PayuLatam\Helper\Data $helperData,
         PaymentHelper $paymentHelper,
-        \Magento\Sales\Api\TransactionRepositoryInterface $transactionRepository
+        \Magento\Sales\Api\TransactionRepositoryInterface $transactionRepository,
+        Order $order,
+        InvoiceService $invoiceService,
+        DbTransaction $dbTransaction,
+        OrderRepository $orderRepository
     )
     {
         parent::__construct($context);
@@ -44,6 +83,10 @@ class Notify  extends \Magento\Framework\App\Action\Action
         $this->request = $request;
         $this->formKey = $formKey;
         $this->request->setParam('form_key', $this->formKey->getFormKey());
+        $this->_order = $order;
+        $this->_invoiceService = $invoiceService;
+        $this->_dbTransaction = $dbTransaction;
+        $this->_orderRepository = $orderRepository;
     }
 
     public function execute()
@@ -51,14 +94,12 @@ class Notify  extends \Magento\Framework\App\Action\Action
         $request = $this->getRequest();
         $params = $request->getParams();
 
-        if (empty($params))
-            return;
+        if (empty($params)) return;
 
-        $order_id = $request->getParam('extra1');
+        $orderId = $request->getParam('extra1');
 
-        $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
-        $order_model = $objectManager->get('Magento\Sales\Model\Order');
-        $order = $order_model->load($order_id);
+        /* @var Order $order */
+        $order = $this->_orderRepository->get($orderId);
 
         $method = $order->getPayment()->getMethod();
         $methodInstance = $this->_paymentHelper->getMethodInstance($method);
@@ -95,8 +136,7 @@ class Notify  extends \Magento\Framework\App\Action\Action
 
         $transaction = $this->_transactionRepository->getByTransactionType(
             Transaction::TYPE_ORDER,
-            $payment->getId(),
-            $payment->getOrder()->getId()
+            $payment->getId()
         );
 
         if ($order->getState() === $pendingOrder && $statusTransaction === '7'){
@@ -124,19 +164,18 @@ class Notify  extends \Magento\Framework\App\Action\Action
 
             $order->setState($aprovvedOrder)->setStatus($status);
 
-            $invoice = $objectManager->create('Magento\Sales\Model\Service\InvoiceService')->prepareInvoice($order);
+            $invoice = $this->_invoiceService->prepareInvoice($order);
             $invoice = $invoice->setTransactionId($transactionId)
                 ->addComment(__("Invoice created"))
-                ->setRequestedCaptureCase(\Magento\Sales\Model\Order\Invoice::CAPTURE_ONLINE);
-            $invoice->register()
-                ->pay();
-            $invoice->save();
+                ->register()
+                ->pay()
+                ->save();
 
             // Save the invoice to the order
-            $transactionInvoice = $this->_objectManager->create('Magento\Framework\DB\Transaction')
+            $this->_dbTransaction
                 ->addObject($invoice)
-                ->addObject($invoice->getOrder());
-            $transactionInvoice->save();
+                ->addObject($invoice->getOrder())
+                ->save();
 
             $order->addStatusHistoryComment(
                 __('Invoice #%1.', $invoice->getId())

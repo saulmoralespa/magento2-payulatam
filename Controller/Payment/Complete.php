@@ -11,7 +11,10 @@ namespace Saulmoralespa\PayuLatam\Controller\Payment;
 use Magento\Framework\Controller\ResultFactory;
 use Magento\Payment\Helper\Data as PaymentHelper;
 use Magento\Sales\Model\Order\Payment\Transaction;
-use Magento\Store\Model\StoreManagerInterface;
+use Magento\Sales\Model\Order;
+use Magento\Sales\Model\Service\InvoiceService;
+use Magento\Framework\DB\Transaction as DbTransaction;
+use Magento\Sales\Model\OrderRepository;
 
 class Complete extends \Magento\Framework\App\Action\Action
 {
@@ -69,6 +72,22 @@ class Complete extends \Magento\Framework\App\Action\Action
      * @var \Magento\Framework\Data\Form\FormKey
      */
     protected $formKey;
+    /**
+     * @var Order
+     */
+    protected $_order;
+    /**
+     * @var InvoiceService
+     */
+    protected $_invoiceService;
+    /**
+     * @var DbTransaction
+     */
+    protected $_dbTransaction;
+    /**
+     * @var OrderRepository
+     */
+    private $_orderRepository;
 
     public function __construct(
         \Saulmoralespa\PayuLatam\Logger\Logger $payuLatamLogger,
@@ -81,7 +100,11 @@ class Complete extends \Magento\Framework\App\Action\Action
         \Psr\Log\LoggerInterface $logger,
         PaymentHelper $paymentHelper,
         \Magento\Sales\Api\TransactionRepositoryInterface $transactionRepository,
-        \Magento\Sales\Model\Order\Payment\Transaction\BuilderInterface $transactionBuilder
+        \Magento\Sales\Model\Order\Payment\Transaction\BuilderInterface $transactionBuilder,
+        Order $order,
+        InvoiceService $invoiceService,
+        DbTransaction $dbTransaction,
+        OrderRepository $orderRepository
     )
     {
         parent::__construct($context);
@@ -98,6 +121,10 @@ class Complete extends \Magento\Framework\App\Action\Action
         $this->request = $request;
         $this->formKey = $formKey;
         $this->request->setParam('form_key', $this->formKey->getFormKey());
+        $this->_order = $order;
+        $this->_invoiceService = $invoiceService;
+        $this->_dbTransaction = $dbTransaction;
+        $this->_orderRepository = $orderRepository;
     }
 
     public function execute()
@@ -105,16 +132,12 @@ class Complete extends \Magento\Framework\App\Action\Action
         $request = $this->getRequest();
         $params = $request->getParams();
 
-        if (empty($params))
-            return;
+        if (empty($params)) return;
 
+        $orderId = $request->getParam('extra1');
 
-        $order_id = $request->getParam('extra1');
-
-        $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
-        $order_model = $objectManager->get('Magento\Sales\Model\Order');
-        $order = $order_model->load($order_id);
-
+        /* @var Order $order */
+        $order = $this->_orderRepository->get($orderId);
         $method = $order->getPayment()->getMethod();
         $methodInstance = $this->_paymentHelper->getMethodInstance($method);
 
@@ -134,7 +157,6 @@ class Complete extends \Magento\Framework\App\Action\Action
 
         $signatureOrder = $methodInstance->getSignValidate($dataSign);
 
-
         if ($signatureOrder !== $signaturePayuLatam){
             $resultRedirect = $this->resultFactory->create(ResultFactory::TYPE_REDIRECT);
             $resultRedirect->setPath('checkout/onepage/failure');
@@ -151,10 +173,8 @@ class Complete extends \Magento\Framework\App\Action\Action
 
         $transaction = $this->_transactionRepository->getByTransactionType(
             Transaction::TYPE_ORDER,
-            $payment->getId(),
-            $payment->getOrder()->getId()
+            $payment->getId()
         );
-
 
         $pathRedirect = "checkout/onepage/success";
 
@@ -171,7 +191,6 @@ class Complete extends \Magento\Framework\App\Action\Action
             $payment->setIsTransactionDenied(true);
             $message = $request->getParam('message');
             $payment->addTransactionCommentsToOrder($transaction, $message);
-            //$transaction->close();
             $order->cancel()->save();
             $pathRedirect = "checkout/onepage/failure";
         }elseif ($order->getState() === $pendingOrder && $statusTransaction === '4'){
@@ -184,19 +203,18 @@ class Complete extends \Magento\Framework\App\Action\Action
 
             $order->setState($aprovvedOrder)->setStatus($status);
 
-            $invoice = $objectManager->create('Magento\Sales\Model\Service\InvoiceService')->prepareInvoice($order);
+            $invoice = $this->_invoiceService->prepareInvoice($order);
             $invoice = $invoice->setTransactionId($transactionId)
                 ->addComment(__("Invoice created"))
-                ->setRequestedCaptureCase(\Magento\Sales\Model\Order\Invoice::CAPTURE_ONLINE);
-            $invoice->register()
-                ->pay();
-            $invoice->save();
+                ->register()
+                ->pay()
+                ->save();
 
             // Save the invoice to the order
-            $transactionInvoice = $this->_objectManager->create('Magento\Framework\DB\Transaction')
+            $this->_dbTransaction
                 ->addObject($invoice)
-                ->addObject($invoice->getOrder());
-            $transactionInvoice->save();
+                ->addObject($invoice->getOrder())
+                ->save();
 
             $order->addStatusHistoryComment(
                 __('Invoice #%1', $invoice->getId())
@@ -205,7 +223,6 @@ class Complete extends \Magento\Framework\App\Action\Action
 
             $message = __("transaction ID:%1", $transactionId);
             $payment->addTransactionCommentsToOrder($transaction, $message);
-            //$transaction->save();
             $order->save();
         }
 

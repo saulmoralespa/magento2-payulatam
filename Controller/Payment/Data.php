@@ -8,31 +8,44 @@
 
 namespace Saulmoralespa\PayuLatam\Controller\Payment;
 
+use Magento\Sales\Model\Order;
 use Magento\Sales\Model\Order\Payment\Transaction;
 use Magento\Payment\Helper\Data as PaymentHelper;
 
 class Data extends \Magento\Framework\App\Action\Action
 {
+    /**
+     * @var \Saulmoralespa\PayuLatam\Helper\Data
+     */
     protected $_helperData;
-
+    /**
+     * @var \Saulmoralespa\PayuLatam\Logger\Logger
+     */
     protected $_payuLatamLogger;
-
+    /**
+     * @var \Magento\Checkout\Model\Session
+     */
     protected $_checkoutSession;
-
-    protected $_orderFactory;
-
+    /**
+     * @var \Magento\Framework\Controller\Result\JsonFactory
+     */
     protected $_resultJsonFactory;
-
+    /**
+     * @var \Magento\Framework\UrlInterface
+     */
     protected $_url;
-
+    /**
+     * @var Transaction\BuilderInterface
+     */
     protected $_transactionBuilder;
-
+    /**
+     * @var PaymentHelper
+     */
     protected $_paymentHelper;
 
     public function __construct(
         \Magento\Framework\App\Action\Context $context,
         \Magento\Checkout\Model\Session $checkoutSession,
-        \Magento\Sales\Model\OrderFactory $orderFactory,
         \Saulmoralespa\PayuLatam\Helper\Data $helperData,
         \Saulmoralespa\PayuLatam\Logger\Logger $payuLatamLogger,
         \Magento\Framework\Controller\Result\JsonFactory $resultJsonFactory,
@@ -43,7 +56,6 @@ class Data extends \Magento\Framework\App\Action\Action
         parent::__construct($context);
 
         $this->_checkoutSession = $checkoutSession;
-        $this->_orderFactory = $orderFactory;
         $this->_helperData = $helperData;
         $this->_payuLatamLogger = $payuLatamLogger;
         $this->_resultJsonFactory = $resultJsonFactory;
@@ -54,7 +66,7 @@ class Data extends \Magento\Framework\App\Action\Action
 
     public function execute()
     {
-        $order = $this->_orderFactory->create()->loadByIncrementId($this->_checkoutSession->getLastRealOrderId());
+        $order = $this->_checkoutSession->getLastRealOrder();
 
         $referenceCode  = time();
 
@@ -64,6 +76,8 @@ class Data extends \Magento\Framework\App\Action\Action
 
         $payment->setParentTransactionId($order->getId());
         $payment->setIsTransactionPending(true);
+
+        /* @var Transaction $transaction */
         $transaction = $this->_transactionBuilder->setPayment($payment)
             ->setOrder($order)
             ->setTransactionId($payment->getTransactionId())
@@ -97,9 +111,9 @@ class Data extends \Magento\Framework\App\Action\Action
 
     }
 
-    public function getDataParamsPayment($order, $referenceCode)
+    public function getDataParamsPayment(Order $order, $referenceCode)
     {
-        $order_id = $order->getId();
+        $orderId = $order->getId();
 
         $address = $this->getAddress($order);
 
@@ -128,8 +142,8 @@ class Data extends \Magento\Framework\App\Action\Action
                 'merchantId' => $this->_helperData->getMerchantId(),
                 'accountId' => $this->_helperData->getAccountId(),
                 'amount' => $amount,
-                'description' => __('Order # %1', $order_id),
-                'extra1' => $order_id,
+                'description' => __('Order # %1', $orderId),
+                'extra1' => $orderId,
                 'buyerFullName' => $address->getFirstname(). ' ' . $address->getLastname(),
                 'buyerEmail' => $order->getCustomerEmail(),
                 'telephone' => $phone,
